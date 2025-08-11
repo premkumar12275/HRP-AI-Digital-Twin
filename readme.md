@@ -58,7 +58,7 @@ Phase 4: Clinical Integration & Simulation
 ```
 ---
 
-## There is a single ipynb file that has all the necessary code blocks in a sequence. For individual project files used as process of learning and implementation are as below.
+## There is a single ipynb file that has all the necessary code blocks in a sequence. For individual project files used as process of learning and implementation are as below. download the MIMIC-III data files before proceeding
 
 
 ## Pipeline Overview

@@ -1,0 +1,40 @@
+import pandas as pd
+from tqdm import tqdm
+
+# Path to full CHARTEVENTS
+INPUT_FILE = "input/CHARTEVENTS.csv.gz"
+OUTPUT_FILE = "output/filtered_chartevents.csv.gz"
+
+# ITEMIDs for vitals we care about (MIMIC-III specific)
+ITEM_IDS = {
+    "Heart Rate": [211],
+    "Systolic BP": [51],
+    "Diastolic BP": [8368],
+    "Mean BP": [456],
+    "Respiratory Rate": [618],
+    "SpO2": [646],
+    "Temperature": [223761]
+}
+
+ITEMID_LIST = sum(ITEM_IDS.values(), [])  # flatten list of item IDs
+
+print("[INFO] Filtering CHARTEVENTS.csv.gz — this may take ~5–15 min...")
+
+chunks = []
+reader = pd.read_csv(
+    INPUT_FILE,
+    usecols=["ICUSTAY_ID", "ITEMID", "CHARTTIME", "VALUENUM"],
+    chunksize=1_000_000,
+    low_memory=False
+)
+
+for chunk in tqdm(reader):
+    filtered = chunk[chunk["ITEMID"].isin(ITEMID_LIST)]
+    chunks.append(filtered)
+
+# Combine and save
+filtered_df = pd.concat(chunks)
+filtered_df.to_csv(OUTPUT_FILE, index=False, compression="gzip")
+
+print(f"[DONE] Saved filtered CHARTEVENTS to: {OUTPUT_FILE}")
+print(f"[INFO] Rows after filtering: {len(filtered_df)}")
